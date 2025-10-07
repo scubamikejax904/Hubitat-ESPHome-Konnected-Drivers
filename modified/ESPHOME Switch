@@ -1,0 +1,139 @@
+/**
+ *  MIT License
+ *  Copyright 2022 Jonathan Bradshaw (jb@nrgup.net)
+ *
+ *  Permission is hereby granted, free of charge, to any person obtaining a copy
+ *  of this software and associated documentation files (the "Software"), to deal
+ *  in the Software without restriction, including without limitation the rights
+ *  to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ *  copies of the Software, and to permit persons to whom the Software is
+ *  furnished to do so, subject to the following conditions:
+ *
+ *  The above copyright notice and this permission notice shall be included in all
+ *  copies or substantial portions of the Software.
+ *
+ *  THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ *  IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ *  FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ *  AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ *  LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ *  OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+ *  SOFTWARE.
+ */
+metadata {
+    definition(
+        name: 'ESPHOME Switch',
+        namespace: 'esphome',
+        author: 'Jonathan Bradshaw',
+        singleThreaded: true,
+        importUrl: 'https://raw.githubusercontent.com/bradsjm/hubitat-drivers/main/ESPHome/ESPHome-Switch.groovy') {
+
+        capability 'Sensor'
+        capability 'Refresh'
+        capability 'Switch'
+
+        // Remove capabilities that are handled by parent
+        // capability 'SignalStrength' - handled by parent
+        // capability 'Initialize' - not needed for child device
+
+        // Remove network status as it's handled by parent
+        // attribute 'networkStatus', 'enum', [ 'connecting', 'online', 'offline' ]
+    }
+
+    preferences {
+        // Remove all IP/connection and entity selection preferences 
+        // as child device communicates through parent
+        input name: 'logEnable',
+                type: 'bool',
+                title: 'Enable Debug Logging',
+                required: false,
+                defaultValue: false
+
+        input name: 'logTextEnable',
+              type: 'bool',
+              title: 'Enable descriptionText logging',
+              required: false,
+              defaultValue: true
+    }
+}
+
+// Remove initialize() - child devices don't need to manage connections
+public void initialize() {
+    // Child device initialization handled by parent
+    if (logEnable) {
+        runIn(1800, 'logsOff')
+    }
+}
+
+public void installed() {
+    log.info "${device} child device installed"
+}
+
+public void logsOff() {
+    device.updateSetting('logEnable', false)
+    log.info "${device} debug logging disabled"
+}
+
+public void updated() {
+    log.info "${device} driver configuration updated"
+    initialize()
+}
+
+public void uninstalled() {
+    log.info "${device} child device uninstalled"
+}
+
+// Switch commands - delegate to parent
+public void on() {
+    if (device.currentValue('switch') != 'on') {
+        if (logTextEnable) { log.info "${device} on" }
+        parent?.componentOn(device)
+    }
+}
+
+public void off() {
+    if (device.currentValue('switch') != 'off') {
+        if (logTextEnable) { log.info "${device} off" }
+        parent?.componentOff(device)
+    }
+}
+
+public void refresh() {
+    // Child device refresh - delegate to parent
+    log.info "${device} refresh requested"
+    parent?.componentRefresh(device)
+}
+
+// Simplified parse method for child device
+// The parent will call this with processed events
+public void parse(List<Map> events) {
+    if (logEnable) { log.debug "Child device received events: ${events}" }
+    
+    events.each { event ->
+        processChildEvent(event)
+    }
+}
+
+// Helper method for parent to send events directly
+public void sendChildEvent(Map event) {
+    if (logEnable) { log.debug "Child device received event: ${event}" }
+    processChildEvent(event)
+}
+
+// Process individual events
+private void processChildEvent(Map event) {
+    switch (event.name) {
+        case 'switch':
+            if (device.currentValue('switch') != event.value) {
+                String typeText = event.type ? " (${event.type})" : ""
+                if (logTextEnable) { 
+                    log.info "${device} ${event.descriptionText ?: "switch is ${event.value}${typeText}"}"
+                }
+                sendEvent(event)
+            }
+            break
+    }
+}
+
+// Remove the ESPHome API library include as it's not needed for child devices
+// #include esphome.espHomeApiHelper
