@@ -20,7 +20,7 @@
  *  OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  *  SOFTWARE.
  */
-//Modified to work with Konnected Alarm Parent driver by ScubaMikeJax904 10-7-2025
+//Modified to work with Hubitat 2.4.3.131 and Konnected Alarm Driver by ScubaMikeJax904 10-7-2025
 metadata {
     definition(
         name: 'ESPHOME Temperature Sensor',
