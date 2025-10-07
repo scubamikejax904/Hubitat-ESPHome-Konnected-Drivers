@@ -33,18 +33,9 @@ metadata {
         capability 'Sensor'
         capability 'Refresh'
         capability 'Switch'
-
-        // Remove capabilities that are handled by parent
-        // capability 'SignalStrength' - handled by parent
-        // capability 'Initialize' - not needed for child device
-
-        // Remove network status as it's handled by parent
-        // attribute 'networkStatus', 'enum', [ 'connecting', 'online', 'offline' ]
     }
 
     preferences {
-        // Remove all IP/connection and entity selection preferences 
-        // as child device communicates through parent
         input name: 'logEnable',
                 type: 'bool',
                 title: 'Enable Debug Logging',
@@ -59,7 +50,6 @@ metadata {
     }
 }
 
-// Remove initialize() - child devices don't need to manage connections
 public void initialize() {
     // Child device initialization handled by parent
     if (logEnable) {
@@ -87,23 +77,19 @@ public void uninstalled() {
 
 // Switch commands - delegate to parent
 public void on() {
-    if (device.currentValue('switch') != 'on') {
-        if (logTextEnable) { log.info "${device} on" }
-        parent?.componentOn(device)
-    }
+    if (logTextEnable) { log.info "${device} on command" }
+    parent?.componentOn(device)
 }
 
 public void off() {
-    if (device.currentValue('switch') != 'off') {
-        if (logTextEnable) { log.info "${device} off" }
-        parent?.componentOff(device)
-    }
+    if (logTextEnable) { log.info "${device} off command" }
+    parent?.componentOff(device)
 }
 
 public void refresh() {
-    // Child device refresh - delegate to parent
-    log.info "${device} refresh requested"
-    parent?.componentRefresh(device)
+    // Don't call componentRefresh since it's not implemented in parent
+    // Just log the refresh request
+    if (logTextEnable) { log.info "${device} refresh requested (handled by parent)" }
 }
 
 // Simplified parse method for child device
@@ -136,6 +122,3 @@ private void processChildEvent(Map event) {
             break
     }
 }
-
-// Remove the ESPHome API library include as it's not needed for child devices
-// #include esphome.espHomeApiHelper
