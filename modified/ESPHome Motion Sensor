@@ -23,7 +23,7 @@
 //Modified to work with Hubitat 2.4.3.131 and Konnected Alarm Driver by ScubaMikeJax904 10-7-2025
 metadata {
     definition(
-        name: 'ESPHome Motion Sensor',
+        name: 'ESPHOME Motion Sensor',
         namespace: 'esphome',
         author: 'Jonathan Bradshaw',
         singleThreaded: true,
@@ -91,7 +91,7 @@ public void uninstalled() {
 // Simplified parse method for child device
 // The parent will call this with processed events
 
-public void parse(Map events) {
+public void parse(List<Map> events) {
 
     if (logEnable) { log.debug "Child device received events: ${events}" }
     events.each { event ->
@@ -121,4 +121,4 @@ public void sendChildEvent(Map event) {
 }	
 
 // Put this line at the end of the driver to include the ESPHome API library helper
-#include esphome.espHomeApiHelper
+//#include esphome.espHomeApiHelper
