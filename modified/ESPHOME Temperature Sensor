@@ -31,7 +31,7 @@ metadata {
 
         capability 'Sensor'
         capability 'Refresh'
-        capability 'RelativeHumidityMeasurement'
+        //capability 'RelativeHumidityMeasurement'
         capability 'TemperatureMeasurement'
 
         // Remove capabilities that are handled by parent
@@ -119,15 +119,15 @@ private void processChildEvent(Map event) {
             }
             break
             
-        case 'humidity':
-            if (device.currentValue('humidity') != event.value) {
-                if (logTextEnable) { 
+//        case 'humidity':
+//            if (device.currentValue('humidity') != event.value) {
+//                if (logTextEnable) { 
                     log.info "${device} ${event.descriptionText ?: "humidity is ${event.value}${event.unit ?: '%'}"}"
                 }
-                sendEvent(event)
-            }
-            break
-    }
+//                sendEvent(event)
+//            }
+//            break
+//    }
 }
 
 // Remove the ESPHome API library include as it's not needed for child devices
