@@ -129,6 +129,3 @@ private void processChildEvent(Map event) {
             break
     }
 }
-
-// Remove the ESPHome API library include as it's not needed for child devices
-// #include esphome.espHomeApiHelper
