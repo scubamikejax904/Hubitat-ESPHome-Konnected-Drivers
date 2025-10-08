@@ -20,25 +20,35 @@
  *  OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  *  SOFTWARE.
  */
+
 //Modified to work with Hubitat 2.4.3.131 and Konnected Alarm Driver by ScubaMikeJax904 10-7-2025
+
+groovy
+
+
 metadata {
     definition(
         name: 'ESPHOME Motion Sensor',
         namespace: 'esphome',
         author: 'Jonathan Bradshaw',
         singleThreaded: true,
-        importUrl: 'https://raw.githubusercontent.com/bradsjm/hubitat-drivers/main/ESPHome/ESPHome-MotionSensor.groovy') {
+        importUrl: 'https://raw.githubusercontent.com/bradsjm/hubitat-drivers/main/ESPHome/ESPHome-ContactSensor.groovy') {
 
         capability 'Sensor'
         capability 'MotionSensor'
         capability 'Refresh'
- 
-        // attribute populated by ESPHome API Library automatically
-        attribute 'networkStatus', 'enum', [ 'connecting', 'online', 'offline' ]
+
+        // Remove capabilities that are handled by parent
+        // capability 'SignalStrength' - handled by parent
+        // capability 'Initialize' - not needed for child device
+
+        // Remove network status as it's handled by parent
+        // attribute 'networkStatus', 'enum', [ 'connecting', 'online', 'offline' ]
     }
 
     preferences {
-         input name: 'logEnable',    // if enabled the library will log debug details
+        // Remove all IP/connection preferences as child device communicates through parent
+        input name: 'logEnable',
                 type: 'bool',
                 title: 'Enable Debug Logging',
                 required: false,
@@ -50,20 +60,16 @@ metadata {
               required: false,
               defaultValue: true
     }
-    }
-
-
-public void initialize() {
-       // Child device initialization handled by parent
-
-    if (logEnable) {
-
-        runIn(1800, 'logsOff')
-
-    }
-
-
 }
+
+// Remove initialize() - child devices don't need to manage connections
+public void initialize() {
+    // Child device initialization handled by parent
+    if (logEnable) {
+        runIn(1800, 'logsOff')
+    }
+}
+
 public void installed() {
     log.info "${device} child device installed"
 }
@@ -85,15 +91,14 @@ public void updated() {
 }
 
 public void uninstalled() {
-        log.info "${device} child device uninstalled"
+    log.info "${device} child device uninstalled"
 }
 
 // Simplified parse method for child device
 // The parent will call this with processed events
-
 public void parse(List<Map> events) {
-
     if (logEnable) { log.debug "Child device received events: ${events}" }
+    
     events.each { event ->
         if (event.name == 'motion') {
             if (device.currentValue('motion') != event.value) {
@@ -105,20 +110,17 @@ public void parse(List<Map> events) {
         }
     }
 }
+
 // Helper method for parent to send events directly
-
 public void sendChildEvent(Map event) {
-
     if (logEnable) { log.debug "Child device received event: ${event}" }
+    
     if (event.name == 'motion') {
         if (device.currentValue('motion') != event.value) {
             if (logTextEnable) { 
-                log.info "${device} ${event.descriptionText ?: "motion is ${event.value}"} "
+                log.info "${device} ${event.descriptionText ?: "motion is ${event.value}"}"
             }
             sendEvent(event)
         }
-    }	
-}	
-
-// Put this line at the end of the driver to include the ESPHome API library helper
-//#include esphome.espHomeApiHelper
+    }
+}
