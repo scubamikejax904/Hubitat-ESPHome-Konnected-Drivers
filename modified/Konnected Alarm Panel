@@ -29,11 +29,11 @@ import com.hubitat.app.DeviceWrapper
 
 metadata {
     definition(
-        name: 'Konnected Alarm Panel',
-        namespace: 'konnected',
+        name: 'Konnected Alarm Panel SMJ Mod',
+        namespace: 'konnected SMJ',
         author: 'Konnected Inc.',
         singleThreaded: true,
-        importUrl: 'https://github.com/konnected-io/konnected-hubitat/blob/master/drivers/konnected-alarm-panel.groovy'
+        importUrl: ''
     ){
         capability 'Refresh'
         capability 'Initialize'
